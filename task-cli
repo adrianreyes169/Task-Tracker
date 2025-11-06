@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+
+import json
+import sys
+import os
+import datetime
+
+
+
+if os.path.exists("data.json"):
+    with open("data.json", "r") as f:
+        data= json.load(f)
+else:
+    data= []
+id_amount = len(data) + 1
+
+if sys.argv[1] == "add":
+    new_item = {"id": id_amount,
+            "description": sys.argv[2],
+            "status": "In Progress",
+            "createdAt": datetime.date.today().isoformat(),
+            "updatedAt": datetime.date.today().isoformat()}
+    data.append(new_item)
+
+    with open("data.json", "w") as f2:
+        json.dump(data, f2, indent = 4)
+
+if sys.argv[1] == "list":
+    with open("data.json", "r") as f1:
+        data = json.load(f1)
+
+    if len(sys.argv) >= 3:
+        if sys.argv[2] == "done":
+                for task in data:
+                    if task["status"] == "Done":
+                        print(task["id"],task["description"])
+        
+        elif sys.argv[2] == "in-progress":
+                for task in data:
+                    if task["status"] == "In Progress":
+                        print(task["id"],task["description"])
+        
+        elif sys.argv[2] == "todo":
+                for task in data:
+                    if task["status"] == "To Do":
+                        print(task["id"],task["description"])
+    else:
+            for task in data:
+                print(task["id"],task["description"])
+
+if sys.argv[1] == "update":
+    with open("data.json", "r") as fu:
+        data = json.load(fu)
+        for task in data:
+            if task["id"] == int(sys.argv[2]):
+                task["description"] = sys.argv[3]
+                task["updatedAt"] = datetime.date.today().isoformat()
+    with open ("data.json", "w") as fw:
+        json.dump(data, fw, indent = 4)
+
+if sys.argv[1] == "delete":
+    with open("data.json" , "r") as fu:
+        data = json.load(fu)
+
+    new_data = []
+    task_counter = 1 
+    for tasks in data:
+        if tasks["id"] != int(sys.argv[2]):
+            if tasks["id"] > int(sys.argv[2]):
+                tasks["id"]-=1
+            new_data.append(tasks)
+    
+    with open("data.json", "w") as fw:
+        json.dump(new_data, fw, indent = 4)
+
+if sys.argv[1] == "mark-in-progress":
+    with open("data.json", "r") as fu:
+        data = json.load(fu)
+
+    for task in data:
+        if task["id"] == int(sys.argv[2]):
+            task["status"] = "In Progress"
+    
+    with open("data.json", "w") as fw:
+        json.dump(data, fw, indent = 4)
+
+if sys.argv[1] == "mark-done":
+    with open("data.json", "r") as fu:
+        data = json.load(fu)
+
+    for task in data:
+        if task["id"] == int(sys.argv[2]):
+            task["status"] = "Done"
+    
+    with open("data.json", "w") as fw:
+        json.dump(data, fw, indent = 4)
